@@ -1,7 +1,8 @@
 import { Router, NextFunction } from 'express';
 import { Request, Response } from 'express';
 import { getPokemons, getPokemonByName, getPokemonsByFilter } from '../services/pokemon';
-import { Filter } from '../types/types';
+import { Filter } from '../types/pokemon';
+
 
 const router = Router();
 

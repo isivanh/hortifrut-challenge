@@ -1,6 +1,6 @@
 import { Router, NextFunction } from 'express';
 import { Request, Response } from 'express';
-import { getTypes } from '../services/type';
+import { getTypes } from '../services/pokemon-type';
 
 const router = Router();
 
@@ -13,7 +13,7 @@ const asyncHandler = (fn: RouteHandler) => (req: Request, res: Response, next: N
 
 router.get(
   '/type',
-  asyncHandler(async (req: Request, res: Response) => {
+  asyncHandler(async (_: Request, res: Response) => {
     const values = await getTypes();
     res.send(values);
   }),

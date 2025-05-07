@@ -1,8 +1,8 @@
-import { BASE_URL } from '../config';
-import { SimpleType } from '../types/types';
+import config from '../config';
+import { PokemonType } from '../types/pokemon-type';
 
-export const getTypes = async (): Promise<SimpleType[]> => {
-  const url = new URL(`${BASE_URL}type/`);
+export const getTypes = async (): Promise<PokemonType[]> => {
+  const url = new URL(`${config.pokeapi_base_url}/type/`);
   const options = {
     method: 'GET',
   };

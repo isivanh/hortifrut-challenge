@@ -1,8 +1,9 @@
-import { BASE_URL } from '../config';
-import { SimpleAbilitie } from '../types/types';
+import config from '../config';
+import { SimpleAbility } from '../types/abililty';
 
-export const getAbilities = async (): Promise<SimpleAbilitie[]> => {
-  const url = new URL(`${BASE_URL}ability/`);
+
+export const getAbilities = async (): Promise<SimpleAbility[]> => {
+  const url = new URL(`${config.pokeapi_base_url}/ability/`);
   const options = {
     method: 'GET',
   };

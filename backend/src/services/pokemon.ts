@@ -1,17 +1,8 @@
-import { BASE_URL } from '../config';
-import { 
-  SimplePokemon,
-  Pokemon,
-  StatResult,
-  TypeResult,
-  AbilitieResult,
-  SimpleType,
-  SimpleAbilitie,
-  Filter
-} from '../types/types';
+import config from '../config';
+import { Filter, Pokemon, SimplePokemon, StatResult } from '../types/pokemon';
 
 export const getPokemons = async (): Promise<SimplePokemon[]> => {
-  const url = new URL(`${BASE_URL}pokemon/`);
+  const url = new URL(`${config.pokeapi_base_url}/pokemon/`);
   url.searchParams.append('limit', '10000');
   const options = {
     method: 'GET',
@@ -51,7 +42,7 @@ export const getPokemonsByFilter = async (filter: Filter): Promise<SimplePokemon
 };
 
 export const getPokemonByName = async (name: string): Promise<Pokemon | null> => {
-  const url = new URL(`${BASE_URL}pokemon/${name}`);
+  const url = new URL(`${config.pokeapi_base_url}/pokemon/${name}`);
   const options = {
     method: 'GET',
   };
@@ -70,14 +61,14 @@ export const getPokemonByName = async (name: string): Promise<Pokemon | null> =>
           effort: stat.effort,
           name: stat.stat.name,
         })),
-        types: data.types.map((type: {type: SimpleType}) => ({
-          name: type.type.name,
-          url: type.type.url,
-        })),
-        abilities: data.abilities.map((ability: {ability: SimpleAbilitie}) => ({
-          name: ability.ability.name,
-          url: ability.ability.url,
-        })),
+        // types: data.types.map((type: {type: PokemonType}) => ({
+        //   name: type.type.name,
+        //   id: type.type.id,
+        // })),
+        // abilities: data.abilities.map((ability: {ability: SimpleAbility}) => ({
+        //   name: ability.ability.name,
+        //   url: ability.ability.url,
+        // })),
         sprites: data.sprites.other.dream_world.front_default,
       };
     } else {
@@ -91,7 +82,7 @@ export const getPokemonByName = async (name: string): Promise<Pokemon | null> =>
 }
 
 export const getPokemonByType = async (type: string): Promise<SimplePokemon[]> => {
-  const url = new URL(`${BASE_URL}type/${type}`);
+  const url = new URL(`${config.pokeapi_base_url}/type/${type}`);
   const options = {
     method: 'GET',
   };
@@ -100,6 +91,7 @@ export const getPokemonByType = async (type: string): Promise<SimplePokemon[]> =
     const response = await fetch(url, options);
     const data = await response.json();
     return data.pokemon.map((pokemon: { pokemon: SimplePokemon }) => pokemon.pokemon);
+    
   } catch (error) {
     console.log('Error: ' + error);
     return [];
@@ -107,7 +99,7 @@ export const getPokemonByType = async (type: string): Promise<SimplePokemon[]> =
 }
 
 export const getPokemonByAbility = async (ability: string): Promise<SimplePokemon[]> => {
-  const url = new URL(`${BASE_URL}ability/${ability}`);
+  const url = new URL(`${config.pokeapi_base_url}/ability/${ability}`);
   const options = {
     method: 'GET',
   };
