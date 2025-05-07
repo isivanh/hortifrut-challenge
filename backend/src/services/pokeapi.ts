@@ -18,7 +18,7 @@ import {
 import { inject, injectable } from "tsyringe";
 import { RedisService } from "./redis-service";
 
-const CACHE_TTL_SECONDS = 1 * 60;
+const CACHE_TTL_SECONDS = 24 * 60 * 60;
 
 @injectable()
 export class PokeApiService {
@@ -44,6 +44,7 @@ export class PokeApiService {
 
     let response: Response;
     try {
+      console.log("Cache miss for", cacheKey);
       response = await fetch(url.toString(), { method: "GET" });
     } catch {
       throw new UnreachablePokeApiError();
