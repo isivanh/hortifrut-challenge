@@ -33,3 +33,12 @@ export interface SimpleAbility{
   name: string,
   id: number
 }
+
+export interface PokemonDetail {
+  name: string;
+  height: number;
+  weight: number;
+  stats: { base_stat: number; name: string }[];
+  types: { id: string; name: string }[];
+  abilities: { id: string; name: string }[];
+}

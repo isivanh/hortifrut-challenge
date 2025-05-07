@@ -1,10 +1,8 @@
-import { Pokemon, SimplePokemon } from "../types/types";
+import { PokemonDetail, SimplePokemon } from "../types/types";
 import { API_URL } from "./config";
 
-export const getPokemonByName = async (limit: number, offset: number, name: string): Promise<Pokemon | null> => {
+export const getPokemonByName = async (name: string): Promise<PokemonDetail | null> => {
   const url = new URL(`${API_URL}pokemon/${name}`);
-  url.searchParams.append('limit', limit.toString());
-  url.searchParams.append('offset', offset.toString());
   const options = {
     method: 'GET',
   };
