@@ -4,7 +4,7 @@ on:
     branches:
       - main
 jobs:
-  lint:
+  backend-lint:
       runs-on: ubuntu-latest
       steps:
         - name: Checkout Repository
@@ -15,7 +15,7 @@ jobs:
           with:
             node-version: '22'
             cache: 'npm'
-            cache-dependency-path: ./package-lock.json
+            cache-dependency-path: backend/package-lock.json
 
         - name: Install dependencies
           run: |
@@ -26,7 +26,7 @@ jobs:
             npm run lint
 
   deploy-backend:
-    needs: lint
+    needs: backend-lint
     runs-on: ubuntu-latest
     env:
       VERCEL_ORG_ID: ${{ secrets.BACKEND_VERCEL_ORG_ID }}
