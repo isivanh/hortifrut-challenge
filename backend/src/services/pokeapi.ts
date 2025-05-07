@@ -2,9 +2,17 @@ import config from "../config";
 import {
   ParsePokeApiResponseError,
   PokeApiError,
+  PokemonNotFoundError,
   UnreachablePokeApiError,
 } from "../error/error";
-import { PokeApiAbilityResponse, PokeApiTypeResponse } from "../types/pokeapi";
+import {
+  PokeApiAbilityResponse,
+  PokeApiAllPokemonsResponse,
+  PokeApiPokemonByAbilityResponse,
+  PokeApiPokemonByTypeResponse,
+  PokeApiPokemonDetail,
+  PokeApiTypeResponse,
+} from "../types/pokeapi";
 import { injectable } from "tsyringe";
 
 @injectable()
@@ -52,5 +60,44 @@ export class PokeApiService {
       offset: offset,
     });
     return data;
+  }
+
+  async getAllPokemons(
+    limit = 20,
+    offset = 0,
+  ): Promise<PokeApiAllPokemonsResponse> {
+    const data = await this.get<PokeApiAllPokemonsResponse>("pokemon", {
+      limit: limit,
+      offset: offset,
+    });
+    return data;
+  }
+
+  async getPokemonByType(type: string): Promise<PokeApiPokemonByTypeResponse> {
+    const data = await this.get<PokeApiPokemonByTypeResponse>(`type/${type}`);
+    return data;
+  }
+
+  async getPokemonByAbility(
+    ability: string,
+  ): Promise<PokeApiPokemonByAbilityResponse> {
+    const data = await this.get<PokeApiPokemonByAbilityResponse>(
+      `ability/${ability}`,
+    );
+    return data;
+  }
+
+  async getPokemonDetail(id: string): Promise<PokeApiPokemonDetail> {
+    try {
+      const data = await this.get<PokeApiPokemonDetail>(`pokemon/${id}`);
+      return data;
+    } catch (error) {
+      if (error instanceof PokeApiError) {
+        if (error.pokeApiStatusCode === 404) {
+          throw new PokemonNotFoundError(id);
+        }
+      }
+      throw error;
+    }
   }
 }

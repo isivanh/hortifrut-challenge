@@ -1,13 +1,13 @@
 import { Router, NextFunction } from "express";
 import { Request, Response } from "express";
-import {
-  getPokemons,
-  getPokemonByName,
-  getPokemonsByFilter,
-} from "../services/pokemon";
-import { Filter } from "../types/pokemon";
+import { PokemonService } from "../services/pokemon";
+import { PokemonFilterRequest } from "../types/pokemon";
+import { getPokemonFilterValidator, validator } from "../error/validator";
+import { container } from "../container";
 
 const router = Router();
+
+const pokemonService = container.resolve(PokemonService);
 
 type RouteHandler = (
   req: Request,
@@ -23,40 +23,27 @@ const asyncHandler =
 
 router.get(
   "/pokemon",
+  getPokemonFilterValidator,
+  validator,
   asyncHandler(async (req: Request, res: Response) => {
-    const values = await getPokemons();
-    res.send(values);
-  }),
-);
-
-router.post(
-  "/pokemon",
-  asyncHandler(async (req: Request, res: Response) => {
-    const { limit, offset, abilities, types } = req.body;
-    const limitValue = Number(limit) || 20;
-    const offsetValue = Number(offset) || 0;
-    const abilitiesValue = Array.isArray(abilities) ? abilities : null;
-    const typesValue = Array.isArray(types) ? types : null;
-    const filter: Filter = {
-      limit: limitValue,
-      offset: offsetValue,
-      abilities: abilitiesValue,
-      types: typesValue,
+    const filters: PokemonFilterRequest = {
+      type: (req.query.type as string) || null,
+      ability: (req.query.ability as string) || null,
+      page: parseInt(req.query.page as string) || 1,
+      pageSize: parseInt(req.query.page_size as string) || 20,
     };
-    const values = await getPokemonsByFilter(filter);
-    res.send(values);
+    const pokemonFilterResponse =
+      await pokemonService.getPokemonsByFilter(filters);
+    res.json(pokemonFilterResponse);
   }),
 );
 
 router.get(
-  "/pokemon/:name",
+  "/pokemon/:id",
   asyncHandler(async (req: Request, res: Response) => {
-    const { name } = req.params;
-    const pokemon = await getPokemonByName(name);
-    if (!pokemon) {
-      return res.status(404).send({ error: "Pokemon not found" });
-    }
-    res.send(pokemon);
+    const { id } = req.params;
+    const pokemon = await pokemonService.getPokemonDetailById(id);
+    res.json(pokemon);
   }),
 );
 

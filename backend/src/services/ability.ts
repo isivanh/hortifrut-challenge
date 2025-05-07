@@ -13,7 +13,7 @@ export class AbilityService {
   async getAbilities(): Promise<PokemonTypeResponse> {
     let allResults: PokeApiAbility[] = [];
     let offset = 0;
-    const limit = 10;
+    const limit = 50;
     let hasNext = true;
 
     while (hasNext) {

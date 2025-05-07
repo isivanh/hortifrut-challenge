@@ -15,7 +15,7 @@ export class UnreachablePokeApiError extends ApiError {
 }
 
 export class PokeApiError extends ApiError {
-  constructor(pokeApiStatusCode: number) {
+  constructor(public pokeApiStatusCode: number) {
     super(500, `PokeAPI returned ${pokeApiStatusCode} status code`);
   }
 }
@@ -23,5 +23,11 @@ export class PokeApiError extends ApiError {
 export class ParsePokeApiResponseError extends ApiError {
   constructor() {
     super(500, `Failed to parse PokeAPI response to JSON`);
+  }
+}
+
+export class PokemonNotFoundError extends ApiError {
+  constructor(id: string) {
+    super(404, `Pokemon with id ${id} not found`);
   }
 }

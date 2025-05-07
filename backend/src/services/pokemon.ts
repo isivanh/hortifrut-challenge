@@ -1,126 +1,141 @@
-import config from "../config";
-import { Filter, Pokemon, SimplePokemon, StatResult } from "../types/pokemon";
+import {
+  PokemonDetailResponse,
+  PokemonFilterRequest,
+  PokemonFilterResponse,
+  PokemonSummary,
+} from "../types/pokemon";
+import { injectable, inject } from "tsyringe";
+import { PokeApiService } from "./pokeapi";
+import {
+  PokeApiAbilityEntry,
+  PokeApiMoveEntry,
+  PokeApiPokemonEntry,
+  PokeApiStatEntry,
+  PokeApiTypeEntry,
+} from "../types/pokeapi";
 
-export const getPokemons = async (): Promise<SimplePokemon[]> => {
-  const url = new URL(`${config.pokeapi_base_url}/pokemon/`);
-  url.searchParams.append("limit", "10000");
-  const options = {
-    method: "GET",
-  };
+@injectable()
+export class PokemonService {
+  constructor(
+    @inject(PokeApiService)
+    private pokeApiService: PokeApiService,
+  ) {}
 
-  try {
-    const response = await fetch(url, options);
-    const data = await response.json();
-    return data.results;
-  } catch (error) {
-    console.log("Error: " + error);
-    return [];
-  }
-};
-
-export const getPokemonsByFilter = async (
-  filter: Filter,
-): Promise<SimplePokemon[]> => {
-  let result: SimplePokemon[] = [];
-
-  if (filter.abilities) {
-    const abilitiesResults = await Promise.all(
-      filter.abilities.map(async (ability) => {
-        return await getPokemonByAbility(ability);
-      }),
-    );
-    result = result.concat(...abilitiesResults);
-  }
-
-  if (filter.types) {
-    const typesResults = await Promise.all(
-      filter.types.map(async (type) => {
-        return await getPokemonByType(type);
-      }),
-    );
-    result = result.concat(...typesResults);
-  }
-  return result;
-};
-
-export const getPokemonByName = async (
-  name: string,
-): Promise<Pokemon | null> => {
-  const url = new URL(`${config.pokeapi_base_url}/pokemon/${name}`);
-  const options = {
-    method: "GET",
-  };
-  try {
-    const response = await fetch(url, options);
-    console.log("Response: " + response);
-    if (response.status === 200) {
-      const data = await response.json();
+  async getPokemonsByFilter(
+    filters: PokemonFilterRequest,
+  ): Promise<PokemonFilterResponse> {
+    if (!filters.ability && !filters.type) {
+      const offset = (filters.page - 1) * filters.pageSize;
+      const allPokemonsResponse = await this.pokeApiService.getAllPokemons(
+        filters.pageSize,
+        offset,
+      );
+      const totalPages = Math.ceil(
+        allPokemonsResponse.count / filters.pageSize,
+      );
       return {
-        id: data.id,
-        name: data.name,
-        height: data.height,
-        weight: data.weight,
-        stats: data.stats.map((stat: StatResult) => ({
-          base_stat: stat.base_stat,
-          effort: stat.effort,
-          name: stat.stat.name,
+        total_pages: totalPages,
+        page: filters.page,
+        results: allPokemonsResponse.results.map((pokemon) => ({
+          id: pokemon.url.split("/").slice(-2)[0],
+          name: pokemon.name,
         })),
-        // types: data.types.map((type: {type: PokemonType}) => ({
-        //   name: type.type.name,
-        //   id: type.type.id,
-        // })),
-        // abilities: data.abilities.map((ability: {ability: SimpleAbility}) => ({
-        //   name: ability.ability.name,
-        //   url: ability.ability.url,
-        // })),
-        sprites: data.sprites.other.dream_world.front_default,
       };
-    } else {
-      console.log("Error: " + response.status);
-      return null;
     }
-  } catch (error) {
-    console.log("Error: " + error);
-    return null;
+
+    let pokemonsByAbilityEntries: PokeApiPokemonEntry[] = [];
+    let pokemonsByTypeEntries: PokeApiPokemonEntry[] = [];
+
+    if (filters.ability) {
+      const pokemonsByAbilityResponse =
+        await this.pokeApiService.getPokemonByAbility(filters.ability);
+      pokemonsByAbilityEntries = pokemonsByAbilityResponse.pokemon;
+    }
+    if (filters.type) {
+      const pokemonsByTypeResponse = await this.pokeApiService.getPokemonByType(
+        filters.type,
+      );
+      pokemonsByTypeEntries = pokemonsByTypeResponse.pokemon;
+    }
+
+    let filteredPokemons: PokemonSummary[] = [];
+    if (filters.ability && filters.type) {
+      const abilityNames = new Set(
+        pokemonsByAbilityEntries.map((entry) => entry.pokemon.name),
+      );
+      filteredPokemons = pokemonsByTypeEntries
+        .filter((pokemon) => abilityNames.has(pokemon.pokemon.name))
+        .map((pokemon) => ({
+          id: pokemon.pokemon.url.split("/").slice(-2)[0],
+          name: pokemon.pokemon.name,
+        }));
+    } else if (filters.ability) {
+      filteredPokemons = pokemonsByAbilityEntries.map((pokemon) => ({
+        id: pokemon.pokemon.url.split("/").slice(-2)[0],
+        name: pokemon.pokemon.name,
+      }));
+    } else if (filters.type) {
+      filteredPokemons = pokemonsByTypeEntries.map((pokemon) => ({
+        id: pokemon.pokemon.url.split("/").slice(-2)[0],
+        name: pokemon.pokemon.name,
+      }));
+    }
+    const totalPages = Math.ceil(filteredPokemons.length / filters.pageSize);
+    return {
+      total_pages: totalPages,
+      page: filters.page,
+      results: filteredPokemons.slice(
+        (filters.page - 1) * filters.pageSize,
+        filters.page * filters.pageSize,
+      ),
+    };
   }
-};
 
-export const getPokemonByType = async (
-  type: string,
-): Promise<SimplePokemon[]> => {
-  const url = new URL(`${config.pokeapi_base_url}/type/${type}`);
-  const options = {
-    method: "GET",
-  };
-
-  try {
-    const response = await fetch(url, options);
-    const data = await response.json();
-    return data.pokemon.map(
-      (pokemon: { pokemon: SimplePokemon }) => pokemon.pokemon,
-    );
-  } catch (error) {
-    console.log("Error: " + error);
-    return [];
+  async getPokemonDetailById(id: string): Promise<PokemonDetailResponse> {
+    const pokemonDetail = await this.pokeApiService.getPokemonDetail(id);
+    return {
+      id: pokemonDetail.id.toString(),
+      name: pokemonDetail.name,
+      base_experience: pokemonDetail.base_experience,
+      height: pokemonDetail.height,
+      weight: pokemonDetail.weight,
+      abilities: pokemonDetail.abilities.map(
+        (ability: PokeApiAbilityEntry) => ({
+          name: ability.ability.name,
+          id: ability.ability.url.split("/").slice(-2)[0],
+        }),
+      ),
+      types: pokemonDetail.types.map((type: PokeApiTypeEntry) => ({
+        id: type.type.url.split("/").slice(-2)[0],
+        name: type.type.name,
+      })),
+      moves: pokemonDetail.moves.map(
+        (move: PokeApiMoveEntry) => move.move.name,
+      ),
+      stats: pokemonDetail.stats.map((stat: PokeApiStatEntry) => ({
+        base_stat: stat.base_stat,
+        effort: stat.effort,
+        name: stat.stat.name,
+      })),
+      sprites: {
+        back_default: pokemonDetail.sprites.back_default ?? null,
+        front_default: pokemonDetail.sprites.front_default ?? null,
+        other: {
+          dream_world: {
+            front_default:
+              pokemonDetail.sprites.other?.dream_world?.front_default ?? null,
+          },
+          home: {
+            front_default:
+              pokemonDetail.sprites.other?.home?.front_default ?? null,
+          },
+          official_artwork: {
+            front_default:
+              pokemonDetail.sprites.other?.official_artwork?.front_default ??
+              null,
+          },
+        },
+      },
+    };
   }
-};
-
-export const getPokemonByAbility = async (
-  ability: string,
-): Promise<SimplePokemon[]> => {
-  const url = new URL(`${config.pokeapi_base_url}/ability/${ability}`);
-  const options = {
-    method: "GET",
-  };
-
-  try {
-    const response = await fetch(url, options);
-    const data = await response.json();
-    return data.pokemon.map(
-      (pokemon: { pokemon: SimplePokemon }) => pokemon.pokemon,
-    );
-  } catch (error) {
-    console.log("Error: " + error);
-    return [];
-  }
-};
+}
