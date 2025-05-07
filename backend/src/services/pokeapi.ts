@@ -15,10 +15,15 @@ import {
   PokeApiPokemonDetail,
   PokeApiTypeResponse,
 } from "../types/pokeapi";
-import { injectable } from "tsyringe";
+import { inject, injectable } from "tsyringe";
+import { RedisService } from "./redis-service";
+
+const CACHE_TTL_SECONDS = 1 * 60;
 
 @injectable()
 export class PokeApiService {
+  constructor(@inject(RedisService) private redisService: RedisService) {}
+
   async get<T>(
     endpoint: string,
     params?: Record<string, string | number>,
@@ -29,8 +34,15 @@ export class PokeApiService {
         url.searchParams.append(key, value.toString());
       });
     }
-    let response: Response;
 
+    const cacheKey = `pokeapi:${url.pathname}${url.search}`;
+    const cached = await this.redisService.get<T>(cacheKey);
+    if (cached) {
+      console.log("Cache hit for", cacheKey);
+      return cached;
+    }
+
+    let response: Response;
     try {
       response = await fetch(url.toString(), { method: "GET" });
     } catch {
@@ -42,7 +54,9 @@ export class PokeApiService {
     }
 
     try {
-      return (await response.json()) as T;
+      const data = (await response.json()) as T;
+      await this.redisService.set(cacheKey, data, CACHE_TTL_SECONDS);
+      return data;
     } catch {
       throw new ParsePokeApiResponseError();
     }
