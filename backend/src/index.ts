@@ -13,8 +13,11 @@ app.use("/api", routes);
 
 app.use(errorHandler);
 
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
-});
+if (require.main === module) {
+  // Only start the server if this file is run directly (development mode)
+  app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+  });
+}
 
 export default app;
