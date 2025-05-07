@@ -13,7 +13,6 @@ export const getAbilities = async (limit: number, offset: number): Promise<Simpl
     const data = await response.json();
     return data.results;
   } catch (error) {
-    console.log('Error: ' + error);
     return [];
   }
 }

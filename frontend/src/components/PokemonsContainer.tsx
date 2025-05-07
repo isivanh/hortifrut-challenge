@@ -18,8 +18,6 @@ export const PokemonsContainer = (props: PockemonsContainerProps) => {
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    let cancelled = false;
-
     const fetchPokemons = async () => {
       if (filter === KindFilter.NAME) {
         const newList = pokemons ? [pokemons] : [];
@@ -43,15 +41,11 @@ export const PokemonsContainer = (props: PockemonsContainerProps) => {
     };
 
     fetchPokemons();
-
-    return () => { cancelled = true; };
   }, [pokemons, filter, types, abilities, page]);
 
   const handleChange = (_: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
   };
-  console.log("PokemonsContainer::P", pokemons);
-  console.log("PokemonsContainer::F", filter);
 
   return (
     <Grid container spacing={2}>

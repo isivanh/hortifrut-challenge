@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box";
 import { KindFilter, SimplePokemon } from '../types/types';
-import { Filters } from './Filters';
+import { Filters } from './filters/Filters';
 
 interface FiltersContainerProps{
   onChange: (value: SimplePokemon | null, filter: KindFilter, id?: number) => void

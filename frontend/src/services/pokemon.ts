@@ -13,15 +13,14 @@ export const getPokemonByName = async (limit: number, offset: number, name: stri
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log('Error: ' + error);
     return null;
   }
 }
 
-export const getPokemons = async (limit: number, offset: number): Promise< SimplePokemon[]> => {
+export const getPokemons = async (page_size: number, page: number): Promise< SimplePokemon[]> => {
   const url = new URL(`${API_URL}pokemon/`);
-  url.searchParams.append('limit', limit.toString());
-  url.searchParams.append('offset', offset.toString());
+  url.searchParams.append('page', page.toString());
+  url.searchParams.append('page_size', page_size.toString());
   const options = {
     method: 'GET',
   };
@@ -30,7 +29,6 @@ export const getPokemons = async (limit: number, offset: number): Promise< Simpl
     const data = await response.json();
     return data.results;
   } catch (error) {
-    console.log('Error: ' + error);
     return [];
   }
 }
@@ -60,7 +58,6 @@ export const getPokemonsByFilter = async (
     const data = await response.json();
     return { page: data.page, total_pages: data.total_pages, pokemons: data.results };
   } catch (error) {
-    console.log('Error: ' + error);
     return { page: 0, total_pages: 0, pokemons: [] };
   }
 }

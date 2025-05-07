@@ -1,4 +1,5 @@
 import { Card, CardContent, CardMedia, Typography} from "@mui/material";
+import question from "../assets/question.png";
 
 interface PokemonCardProps {
   name: string;
@@ -20,8 +21,11 @@ export const PokemonCard = (props: PokemonCardProps) => {
         component="img"
         height="200"
         image={"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/" + id + ".svg"}
-        alt={"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/" + id + ".png"}
+        alt={name}
         sx={{ objectFit: "contain", bgcolor: "#f5f5f5" }}
+        onError={(e) => {
+          (e.currentTarget as HTMLImageElement).src = question;
+        }}
       />
       <CardContent>
         <Typography 

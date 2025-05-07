@@ -13,7 +13,6 @@ export const getTypes = async (limit: number, offset: number): Promise<SimpleTyp
     const data = await response.json();
     return data.results;
   } catch (error) {
-    console.log('Error: ' + error);
     return [];
   }
 }
