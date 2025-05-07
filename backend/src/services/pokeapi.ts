@@ -1,8 +1,10 @@
 import config from "../config";
 import {
+  AbilityNotFoundError,
   ParsePokeApiResponseError,
   PokeApiError,
   PokemonNotFoundError,
+  PokemonTypeNotFoundError,
   UnreachablePokeApiError,
 } from "../error/error";
 import {
@@ -74,17 +76,35 @@ export class PokeApiService {
   }
 
   async getPokemonByType(type: string): Promise<PokeApiPokemonByTypeResponse> {
-    const data = await this.get<PokeApiPokemonByTypeResponse>(`type/${type}`);
-    return data;
+    try {
+      const data = await this.get<PokeApiPokemonByTypeResponse>(`type/${type}`);
+      return data;
+    } catch (error) {
+      if (error instanceof PokeApiError) {
+        if (error.pokeApiStatusCode === 404) {
+          throw new PokemonTypeNotFoundError(type);
+        }
+      }
+      throw error;
+    }
   }
 
   async getPokemonByAbility(
     ability: string,
   ): Promise<PokeApiPokemonByAbilityResponse> {
-    const data = await this.get<PokeApiPokemonByAbilityResponse>(
-      `ability/${ability}`,
-    );
-    return data;
+    try {
+      const data = await this.get<PokeApiPokemonByAbilityResponse>(
+        `ability/${ability}`,
+      );
+      return data;
+    } catch (error) {
+      if (error instanceof PokeApiError) {
+        if (error.pokeApiStatusCode === 404) {
+          throw new AbilityNotFoundError(ability);
+        }
+      }
+      throw error;
+    }
   }
 
   async getPokemonDetail(id: string): Promise<PokeApiPokemonDetail> {

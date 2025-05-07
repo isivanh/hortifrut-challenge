@@ -31,3 +31,15 @@ export class PokemonNotFoundError extends ApiError {
     super(404, `Pokemon with id ${id} not found`);
   }
 }
+
+export class AbilityNotFoundError extends ApiError {
+  constructor(id: string) {
+    super(404, `Ability with id ${id} not found`);
+  }
+}
+
+export class PokemonTypeNotFoundError extends ApiError {
+  constructor(id: string) {
+    super(404, `Pokemon type with id ${id} not found`);
+  }
+}
