@@ -13,7 +13,9 @@
   "license": "ISC",
   "description": "Backend for Hortifrut challenge",
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "tsyringe": "^4.8.0",
+    "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",

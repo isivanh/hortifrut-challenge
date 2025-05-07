@@ -1,4 +1,6 @@
+import "reflect-metadata";
 import express from "express";
+import "./container";
 import routes from "./routes";
 import { errorHandler } from "./error/error-middleware";
 
