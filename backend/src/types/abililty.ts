@@ -1,20 +1,20 @@
 import { SimplePokemon } from "./pokemon";
 
-export interface SimpleAbility{
-  name: string,
-  url: string
+export interface SimpleAbility {
+  name: string;
+  url: string;
 }
 
-export interface AbilityResult{
-  id: number,
-  name: string,
+export interface AbilityResult {
+  id: number;
+  name: string;
   pokemon: {
-    pokemon: SimplePokemon,
-  }[],
+    pokemon: SimplePokemon;
+  }[];
 }
 
-export interface Ability{
-  id: number,
-  name: string,
-  pokemons: SimplePokemon[],
+export interface Ability {
+  id: number;
+  name: string;
+  pokemons: SimplePokemon[];
 }

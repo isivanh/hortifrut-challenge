@@ -1,19 +1,28 @@
-import { Router, NextFunction } from 'express';
-import { Request, Response } from 'express';
-import { getPokemons, getPokemonByName, getPokemonsByFilter } from '../services/pokemon';
-import { Filter } from '../types/pokemon';
-
+import { Router, NextFunction } from "express";
+import { Request, Response } from "express";
+import {
+  getPokemons,
+  getPokemonByName,
+  getPokemonsByFilter,
+} from "../services/pokemon";
+import { Filter } from "../types/pokemon";
 
 const router = Router();
 
-type RouteHandler = (req: Request, res: Response, next: NextFunction) => Promise<any>;
+type RouteHandler = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+) => Promise<any>;
 
-const asyncHandler = (fn: RouteHandler) => (req: Request, res: Response, next: NextFunction) => {
-  return Promise.resolve(fn(req, res, next)).catch(next);
-};
+const asyncHandler =
+  (fn: RouteHandler) => (req: Request, res: Response, next: NextFunction) => {
+    return Promise.resolve(fn(req, res, next)).catch(next);
+  };
 
 router.get(
-  '/pokemon',
+  "/pokemon",
   asyncHandler(async (req: Request, res: Response) => {
     const values = await getPokemons();
     res.send(values);
@@ -21,7 +30,7 @@ router.get(
 );
 
 router.post(
-  '/pokemon',
+  "/pokemon",
   asyncHandler(async (req: Request, res: Response) => {
     const { limit, offset, abilities, types } = req.body;
     const limitValue = Number(limit) || 20;
@@ -40,12 +49,12 @@ router.post(
 );
 
 router.get(
-  '/pokemon/:name',
+  "/pokemon/:name",
   asyncHandler(async (req: Request, res: Response) => {
     const { name } = req.params;
     const pokemon = await getPokemonByName(name);
     if (!pokemon) {
-      return res.status(404).send({ error: 'Pokemon not found' });
+      return res.status(404).send({ error: "Pokemon not found" });
     }
     res.send(pokemon);
   }),

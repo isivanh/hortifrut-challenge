@@ -1,54 +1,58 @@
-import config from '../config';
-import { Filter, Pokemon, SimplePokemon, StatResult } from '../types/pokemon';
+import config from "../config";
+import { Filter, Pokemon, SimplePokemon, StatResult } from "../types/pokemon";
 
 export const getPokemons = async (): Promise<SimplePokemon[]> => {
   const url = new URL(`${config.pokeapi_base_url}/pokemon/`);
-  url.searchParams.append('limit', '10000');
+  url.searchParams.append("limit", "10000");
   const options = {
-    method: 'GET',
+    method: "GET",
   };
-  
+
   try {
     const response = await fetch(url, options);
     const data = await response.json();
     return data.results;
   } catch (error) {
-    console.log('Error: ' + error);
+    console.log("Error: " + error);
     return [];
   }
 };
 
-export const getPokemonsByFilter = async (filter: Filter): Promise<SimplePokemon[]> => {
+export const getPokemonsByFilter = async (
+  filter: Filter,
+): Promise<SimplePokemon[]> => {
   let result: SimplePokemon[] = [];
 
   if (filter.abilities) {
     const abilitiesResults = await Promise.all(
       filter.abilities.map(async (ability) => {
         return await getPokemonByAbility(ability);
-      })
+      }),
     );
     result = result.concat(...abilitiesResults);
   }
-  
+
   if (filter.types) {
     const typesResults = await Promise.all(
       filter.types.map(async (type) => {
         return await getPokemonByType(type);
-      })
+      }),
     );
     result = result.concat(...typesResults);
   }
   return result;
 };
 
-export const getPokemonByName = async (name: string): Promise<Pokemon | null> => {
+export const getPokemonByName = async (
+  name: string,
+): Promise<Pokemon | null> => {
   const url = new URL(`${config.pokeapi_base_url}/pokemon/${name}`);
   const options = {
-    method: 'GET',
+    method: "GET",
   };
   try {
     const response = await fetch(url, options);
-    console.log('Response: ' + response);
+    console.log("Response: " + response);
     if (response.status === 200) {
       const data = await response.json();
       return {
@@ -72,44 +76,51 @@ export const getPokemonByName = async (name: string): Promise<Pokemon | null> =>
         sprites: data.sprites.other.dream_world.front_default,
       };
     } else {
-      console.log('Error: ' + response.status);
+      console.log("Error: " + response.status);
       return null;
     }
   } catch (error) {
-    console.log('Error: ' + error);
+    console.log("Error: " + error);
     return null;
   }
-}
+};
 
-export const getPokemonByType = async (type: string): Promise<SimplePokemon[]> => {
+export const getPokemonByType = async (
+  type: string,
+): Promise<SimplePokemon[]> => {
   const url = new URL(`${config.pokeapi_base_url}/type/${type}`);
   const options = {
-    method: 'GET',
+    method: "GET",
   };
-  
+
   try {
     const response = await fetch(url, options);
     const data = await response.json();
-    return data.pokemon.map((pokemon: { pokemon: SimplePokemon }) => pokemon.pokemon);
-    
+    return data.pokemon.map(
+      (pokemon: { pokemon: SimplePokemon }) => pokemon.pokemon,
+    );
   } catch (error) {
-    console.log('Error: ' + error);
+    console.log("Error: " + error);
     return [];
   }
-}
+};
 
-export const getPokemonByAbility = async (ability: string): Promise<SimplePokemon[]> => {
+export const getPokemonByAbility = async (
+  ability: string,
+): Promise<SimplePokemon[]> => {
   const url = new URL(`${config.pokeapi_base_url}/ability/${ability}`);
   const options = {
-    method: 'GET',
+    method: "GET",
   };
-  
+
   try {
     const response = await fetch(url, options);
     const data = await response.json();
-    return data.pokemon.map((pokemon: { pokemon: SimplePokemon }) => pokemon.pokemon);
+    return data.pokemon.map(
+      (pokemon: { pokemon: SimplePokemon }) => pokemon.pokemon,
+    );
   } catch (error) {
-    console.log('Error: ' + error);
+    console.log("Error: " + error);
     return [];
   }
-}
+};

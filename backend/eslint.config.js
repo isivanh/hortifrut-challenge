@@ -17,7 +17,6 @@ export default tseslint.config(
       prettier: prettierPlugin,
     },
     rules: {
-      ...reactHooks.configs.recommended.rules,
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       'prettier/prettier': 'error',
     },

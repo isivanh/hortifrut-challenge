@@ -1,11 +1,6 @@
-import { Router } from 'express';
-import pokemon from './controller/pokemon';
-import types from './controller/pokemon-type';
-import abilities from './controller/ability';
+import { Router } from "express";
+import types from "./controller/pokemon-type";
 
-const api = Router()
-  // .use(pokemon)
-  .use(types)
-  // .use(abilities);
+const api = Router().use(types);
 
-export default Router().use('/v1', api);
+export default Router().use("/v1", api);
