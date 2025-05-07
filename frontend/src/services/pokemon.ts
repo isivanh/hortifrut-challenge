@@ -12,7 +12,7 @@ export const getPokemonByName = async (limit: number, offset: number, name: stri
     const response = await fetch(url, options);
     const data = await response.json();
     return data;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -28,7 +28,7 @@ export const getPokemons = async (page_size: number, page: number): Promise< Sim
     const response = await fetch(url, options);
     const data = await response.json();
     return data.results;
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -57,7 +57,7 @@ export const getPokemonsByFilter = async (
     const response = await fetch(url, options);
     const data = await response.json();
     return { page: data.page, total_pages: data.total_pages, pokemons: data.results };
-  } catch (error) {
+  } catch {
     return { page: 0, total_pages: 0, pokemons: [] };
   }
 }

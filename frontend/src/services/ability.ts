@@ -12,7 +12,7 @@ export const getAbilities = async (limit: number, offset: number): Promise<Simpl
     const response = await fetch(url, options);
     const data = await response.json();
     return data.results;
-  } catch (error) {
+  } catch {
     return [];
   }
 }

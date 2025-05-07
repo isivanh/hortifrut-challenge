@@ -12,7 +12,7 @@ export const getTypes = async (limit: number, offset: number): Promise<SimpleTyp
     const response = await fetch(url, options);
     const data = await response.json();
     return data.results;
-  } catch (error) {
+  } catch {
     return [];
   }
 }
