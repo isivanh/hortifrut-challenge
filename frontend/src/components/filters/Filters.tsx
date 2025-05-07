@@ -1,34 +1,33 @@
 import {SyntheticEvent, useState, Fragment} from 'react';
-import { KindFilter, SimpleAbility, SimplePokemon, SimpleType } from "../types/types";
+import { KindFilter, SimpleAbility, SimplePokemon, SimpleType } from "../../types/types";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from "@mui/material/Box";
-import { getPokemons } from "../services/pokemon";
-import { getTypes } from "../services/types";
-import { getAbilities } from "../services/ability";
+import { getPokemons } from "../../services/pokemon";
+import { getTypes } from "../../services/types";
+import { getAbilities } from "../../services/ability";
 
 const CACHE_KEY_PREFIX = "filters-cache-";
 
 const getValues = async (filter: KindFilter): Promise<SimplePokemon[]| SimpleAbility[]|SimpleType[]> => {
   const cacheKey = `${CACHE_KEY_PREFIX}${filter}`;
   const cached = localStorage.getItem(cacheKey);
-  if (cached) {
+  if (cached && cached.length > 0) {
     try {
       return JSON.parse(cached);
     } catch {
-      console.error("Error parsing cached data:", cached);
       localStorage.removeItem(cacheKey);
     }
   }
 
   let result: SimplePokemon[] | SimpleAbility[] | SimpleType[] = [];
   if (filter === KindFilter.NAME) {
-    result = await getPokemons(10, 0);
+    result = await getPokemons(100, 1);
   } else if (filter === KindFilter.TYPE) {
-    result = await getTypes(10, 0);
+    result = await getTypes(100, 1);
   } else if (filter === KindFilter.ABILITY) {
-    result = await getAbilities(10, 0);
+    result = await getAbilities(100, 1);
   }
 
   localStorage.setItem(cacheKey, JSON.stringify(result));
