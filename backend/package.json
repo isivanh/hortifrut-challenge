@@ -6,19 +6,22 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
-    "lint": "eslint . --fix"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "keywords": [],
   "author": "Ivan Hancco <isivanh@gmail.com>",
   "license": "ISC",
   "description": "Backend for Hortifrut challenge",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^5.1.0",
     "tsyringe": "^4.8.0",
     "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/node": "^22.15.14",
     "ts-node": "^10.9.2",

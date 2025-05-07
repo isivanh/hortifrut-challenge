@@ -22,7 +22,6 @@ export class PokeApiService {
     let response: Response;
 
     try {
-      console.log(url.toString());
       response = await fetch(url.toString(), { method: "GET" });
     } catch {
       throw new UnreachablePokeApiError();

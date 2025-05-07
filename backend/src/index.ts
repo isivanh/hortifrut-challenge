@@ -3,11 +3,13 @@ import express from "express";
 import "./container";
 import routes from "./routes";
 import { errorHandler } from "./error/error-middleware";
+import cors from 'cors';
 
-const app = express();
 const port = process.env.PORT || 3000;
+const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 app.use("/api", routes);
 
