@@ -1,8 +1,11 @@
 import { Router, NextFunction } from "express";
 import { Request, Response } from "express";
-import { getAbilities } from "../services/ability";
+import { container } from "../container";
+import { AbilityService } from "../services/ability";
 
 const router = Router();
+
+const abilityService = container.resolve(AbilityService);
 
 type RouteHandler = (
   req: Request,
@@ -19,8 +22,8 @@ const asyncHandler =
 router.get(
   "/ability",
   asyncHandler(async (req: Request, res: Response) => {
-    const values = await getAbilities();
-    res.send(values);
+    const abilityResponse = await abilityService.getAbilities();
+    res.send(abilityResponse);
   }),
 );
 

@@ -4,7 +4,7 @@ import {
   PokeApiError,
   UnreachablePokeApiError,
 } from "../error/error";
-import { PokeApiTypeResponse } from "../types/pokeapi";
+import { PokeApiAbilityResponse, PokeApiTypeResponse } from "../types/pokeapi";
 import { injectable } from "tsyringe";
 
 @injectable()
@@ -40,6 +40,14 @@ export class PokeApiService {
 
   async getTypes(limit = 20, offset = 0): Promise<PokeApiTypeResponse> {
     const data = await this.get<PokeApiTypeResponse>("type", {
+      limit: limit,
+      offset: offset,
+    });
+    return data;
+  }
+
+  async getAbilities(limit = 20, offset = 0): Promise<PokeApiAbilityResponse> {
+    const data = await this.get<PokeApiAbilityResponse>("ability", {
       limit: limit,
       offset: offset,
     });

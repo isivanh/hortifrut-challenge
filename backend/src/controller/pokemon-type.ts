@@ -23,7 +23,7 @@ router.get(
   "/type",
   asyncHandler(async (_: Request, res: Response) => {
     const pokemonTypeResponse = await pokemonTypeService.getTypes();
-    res.send(pokemonTypeResponse);
+    res.json(pokemonTypeResponse);
   }),
 );
 
